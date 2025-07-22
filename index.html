@@ -23,6 +23,8 @@
         <h1 class="main-title">SARAH'S BIRTHDAY GAMES</h1>
         <h2 class="sub-title">INPUT CODE</h2>
         
+        <button id="hint-button" class="hint-button">💡 HINT</button>
+        
         <div class="code-display-container">
             <div id="display" class="code-display"></div>
         </div>
@@ -45,6 +47,15 @@
         </div>
     </div>
 
+    <!-- Hint popup -->
+    <div id="hint-popup" class="hint-popup">
+        <div class="hint-content">
+            <button id="close-hint" class="close-hint">✕</button>
+            <h3>🎯 HINT</h3>
+            <p>You can guess the four-digit code or try to solve the crossword puzzle hidden under the flower!</p>
+        </div>
+    </div>
+
     <script>
         const correctCode = "2007";
         let input = "";
@@ -54,6 +65,9 @@
         const keys = document.querySelectorAll('.key');
         const backgroundMusic = document.getElementById('background-music');
         const failSound = document.getElementById('fail-sound');
+        const hintButton = document.getElementById('hint-button');
+        const hintPopup = document.getElementById('hint-popup');
+        const closeHint = document.getElementById('close-hint');
 
         function updateDisplay() {
             display.innerHTML = '';
@@ -129,6 +143,24 @@
         });
 
         updateDisplay();
+
+        // Hint popup functionality
+        hintButton.addEventListener('click', () => {
+            addVibration();
+            hintPopup.classList.add('show');
+        });
+
+        closeHint.addEventListener('click', () => {
+            addVibration();
+            hintPopup.classList.remove('show');
+        });
+
+        // Close popup when clicking outside
+        hintPopup.addEventListener('click', (e) => {
+            if (e.target === hintPopup) {
+                hintPopup.classList.remove('show');
+            }
+        });
 
         // Background music setup
         // Try to play music immediately
