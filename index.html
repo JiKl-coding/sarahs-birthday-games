@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah's Birthday Games</title>
+    <link rel="stylesheet" href="globals.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title">SARAH'S BIRTHDAY GAMES</h1>
+        <h2 class="sub-title">INPUT CODE</h2>
+        
+        <div class="code-display-container">
+            <div id="display" class="code-display"></div>
+        </div>
+        
+        <div id="error-message" class="error-message"></div>
+        
+        <div class="keypad">
+            <button class="key number">1</button>
+            <button class="key number">2</button>
+            <button class="key number">3</button>
+            <button class="key number">4</button>
+            <button class="key number">5</button>
+            <button class="key number">6</button>
+            <button class="key number">7</button>
+            <button class="key number">8</button>
+            <button class="key number">9</button>
+            <button class="key action clear">C</button>
+            <button class="key number">0</button>
+            <button class="key action backspace">⌫</button>
+        </div>
+    </div>
+
+    <script>
+        const correctCode = "2007";
+        let input = "";
+
+        const display = document.getElementById('display');
+        const errorMsg = document.getElementById('error-message');
+        const keys = document.querySelectorAll('.key');
+
+        function updateDisplay() {
+            display.innerHTML = '';
+            for (let i = 0; i < 4; i++) {
+                const digit = document.createElement('span');
+                digit.className = 'digit-slot';
+                digit.textContent = input[i] || '';
+                if (input[i]) {
+                    digit.classList.add('filled');
+                }
+                display.appendChild(digit);
+            }
+        }
+
+        function resetInput(showError = false) {
+            input = "";
+            updateDisplay();
+            if (showError) {
+                errorMsg.textContent = "YOU HAVE FAILED, TRY AGAIN";
+                errorMsg.classList.add('show');
+                setTimeout(() => {
+                    errorMsg.textContent = "";
+                    errorMsg.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        function addVibration() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        keys.forEach(key => {
+            key.addEventListener('click', () => {
+                addVibration();
+                
+                if (key.classList.contains('backspace')) {
+                    input = input.slice(0, -1);
+                } else if (key.classList.contains('clear')) {
+                    resetInput();
+                } else if (key.classList.contains('number') && input.length < 4) {
+                    input += key.textContent;
+                }
+                
+                updateDisplay();
+                
+                if (input.length === 4) {
+                    setTimeout(() => {
+                        if (input === correctCode) {
+                            window.location.href = "/game";
+                        } else {
+                            resetInput(true);
+                        }
+                    }, 200);
+                }
+            });
+        });
+
+        updateDisplay();
+    </script>
+</body>
+</html>
