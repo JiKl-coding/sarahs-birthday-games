@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="globals.css">
 </head>
 <body>
+    <!-- Background music -->
+    <audio id="background-music" autoplay loop preload="auto">
+        <source src="epicsaxguy.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
     <div class="container">
         <h1 class="main-title">SARAH'S BIRTHDAY GAMES</h1>
         <h2 class="sub-title">INPUT CODE</h2>
@@ -100,6 +106,29 @@
         });
 
         updateDisplay();
+
+        // Background music setup
+        const backgroundMusic = document.getElementById('background-music');
+        
+        // Try to play music immediately
+        backgroundMusic.play().catch(() => {
+            // If autoplay is blocked, play on first user interaction
+            document.addEventListener('touchstart', playMusic, { once: true });
+            document.addEventListener('click', playMusic, { once: true });
+        });
+        
+        function playMusic() {
+            backgroundMusic.play().catch(e => console.log('Audio play failed:', e));
+        }
+
+        // Ensure music keeps playing even if paused
+        backgroundMusic.addEventListener('pause', () => {
+            setTimeout(() => {
+                if (!backgroundMusic.ended) {
+                    backgroundMusic.play().catch(e => console.log('Resume failed:', e));
+                }
+            }, 100);
+        });
     </script>
 </body>
 </html>
