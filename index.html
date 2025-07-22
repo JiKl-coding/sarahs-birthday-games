@@ -13,6 +13,12 @@
         Your browser does not support the audio element.
     </audio>
     
+    <!-- Fail sound effect -->
+    <audio id="fail-sound" preload="auto">
+        <source src="you-have-failed.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    
     <div class="container">
         <h1 class="main-title">SARAH'S BIRTHDAY GAMES</h1>
         <h2 class="sub-title">INPUT CODE</h2>
@@ -46,6 +52,8 @@
         const display = document.getElementById('display');
         const errorMsg = document.getElementById('error-message');
         const keys = document.querySelectorAll('.key');
+        const backgroundMusic = document.getElementById('background-music');
+        const failSound = document.getElementById('fail-sound');
 
         function updateDisplay() {
             display.innerHTML = '';
@@ -60,12 +68,27 @@
             }
         }
 
+        function playFailSound() {
+            // Pause background music
+            backgroundMusic.pause();
+            
+            // Play fail sound
+            failSound.currentTime = 0; // Reset to beginning
+            failSound.play().catch(e => console.log('Fail sound failed:', e));
+            
+            // Resume background music after fail sound ends
+            failSound.addEventListener('ended', () => {
+                backgroundMusic.play().catch(e => console.log('Resume music failed:', e));
+            }, { once: true });
+        }
+
         function resetInput(showError = false) {
             input = "";
             updateDisplay();
             if (showError) {
                 errorMsg.textContent = "YOU HAVE FAILED, TRY AGAIN";
                 errorMsg.classList.add('show');
+                playFailSound(); // Play fail sound
                 setTimeout(() => {
                     errorMsg.textContent = "";
                     errorMsg.classList.remove('show');
@@ -108,8 +131,6 @@
         updateDisplay();
 
         // Background music setup
-        const backgroundMusic = document.getElementById('background-music');
-        
         // Try to play music immediately
         backgroundMusic.play().catch(() => {
             // If autoplay is blocked, play on first user interaction
