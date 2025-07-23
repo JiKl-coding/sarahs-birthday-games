@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah's Birthday Games - Caesar Cipher</title>
+    <link rel="stylesheet" href="globals.css">
+    <style>
+        /* Additional styles for cipher page */
+        .cipher-container {
+            padding: 15px;
+            height: 100vh;
+            width: 100vw;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            overflow-y: auto;
+            gap: 20px;
+        }
+
+        .cipher-table {
+            width: 100%;
+            max-width: 350px;
+            background: linear-gradient(135deg, #000 0%, #333 100%);
+            border-radius: 15px;
+            border: 3px solid #fff;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .cipher-title {
+            color: #ffbe0b;
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 900;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 15px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .alphabet-column {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .alphabet-pair {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #fff;
+        }
+
+        .original-letter {
+            color: #fff;
+            font-weight: 900;
+            font-size: clamp(14px, 3.5vw, 16px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .cipher-letter {
+            color: #ffbe0b;
+            font-weight: 900;
+            font-size: clamp(14px, 3.5vw, 16px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .arrow {
+            color: #06ffa5;
+            font-weight: 900;
+            font-size: clamp(12px, 3vw, 14px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+
+        .password-section {
+            width: 100%;
+            max-width: 350px;
+            background: linear-gradient(135deg, #000 0%, #333 100%);
+            border-radius: 15px;
+            border: 3px solid #fff;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .password-label {
+            color: #06ffa5;
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 900;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #06ffa5 0%, #3a86ff 100%);
+            border: 3px solid #fff;
+            border-radius: 15px;
+            color: #000;
+            font-weight: 900;
+            font-size: clamp(16px, 4vw, 18px);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+            box-sizing: border-box;
+        }
+
+        .password-input::placeholder {
+            color: rgba(0,0,0,0.6);
+            font-weight: 700;
+        }
+
+        .submit-password {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 900;
+            cursor: pointer;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            box-shadow: 
+                0 6px 0 #1a1a5e,
+                0 10px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            flex-shrink: 0;
+        }
+
+        .submit-password:active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 2px 0 #1a1a5e,
+                0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .error-message {
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 900;
+            color: #fff;
+            text-align: center;
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 3px solid #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 100%;
+            max-width: 350px;
+            box-sizing: border-box;
+        }
+
+        .error-message.show {
+            opacity: 1;
+            transform: scale(1);
+            animation: errorShake 0.5s ease-in-out;
+        }
+
+        /* Mobile optimizations */
+        @media (max-height: 700px) {
+            .cipher-container {
+                gap: 15px;
+                padding: 10px;
+            }
+            
+            .cipher-table,
+            .password-section {
+                max-width: 320px;
+                padding: 15px;
+            }
+            
+            .alphabet-pair {
+                padding: 6px 10px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .cipher-container {
+                gap: 12px;
+                padding: 8px;
+            }
+            
+            .cipher-table,
+            .password-section {
+                max-width: 300px;
+                padding: 12px;
+            }
+            
+            .alphabet-pair {
+                padding: 5px 8px;
+            }
+            
+            .password-input {
+                padding: 12px;
+            }
+            
+            .submit-password {
+                padding: 12px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Success audio -->
+    <audio id="success-sound" preload="auto">
+        <source src="asterix.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <div class="cipher-container">
+        <h1 class="main-title">CAESAR CIPHER</h1>
+        <h2 class="sub-title">DECODE THE KEY</h2>
+        
+        <div class="cipher-table">
+            <div class="cipher-title">🔑 ALPHABET KEY</div>
+            <div class="alphabet-grid">
+                <div class="alphabet-column">
+                    <div class="alphabet-pair">
+                        <span class="original-letter">A</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">W</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">B</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">X</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">C</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">Y</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">D</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">Z</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">E</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">A</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">F</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">B</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">G</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">C</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">H</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">D</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">I</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">E</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">J</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">F</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">K</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">G</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">L</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">H</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">M</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">I</span>
+                    </div>
+                </div>
+                <div class="alphabet-column">
+                    <div class="alphabet-pair">
+                        <span class="original-letter">N</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">J</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">O</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">K</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">P</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">L</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">Q</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">M</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">R</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">N</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">S</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">O</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">T</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">P</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">U</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">Q</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">V</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">R</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">W</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">S</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">X</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">T</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">Y</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">U</span>
+                    </div>
+                    <div class="alphabet-pair">
+                        <span class="original-letter">Z</span>
+                        <span class="arrow">→</span>
+                        <span class="cipher-letter">V</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="password-section">
+            <div class="password-label">🔓 VLOŽ HESLO</div>
+            <input type="text" id="password-input" class="password-input" placeholder="Enter password..." maxlength="20">
+            <button id="submit-password" class="submit-password">🔍 SUBMIT</button>
+        </div>
+
+        <div id="error-message" class="error-message"></div>
+    </div>
+
+    <script>
+        const correctPassword = "asterix";
+        let isSubmitting = false;
+
+        const passwordInput = document.getElementById('password-input');
+        const submitButton = document.getElementById('submit-password');
+        const errorMessage = document.getElementById('error-message');
+        const successSound = document.getElementById('success-sound');
+
+        // Add vibration feedback
+        function addVibration() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        // Handle password submission
+        function handleSubmit() {
+            if (isSubmitting) return;
+            
+            const enteredPassword = passwordInput.value.toLowerCase().trim();
+            
+            if (!enteredPassword) {
+                showError("PLEASE ENTER A PASSWORD");
+                return;
+            }
+
+            addVibration();
+
+            if (enteredPassword === correctPassword) {
+                isSubmitting = true;
+                
+                // Play success sound
+                successSound.play().catch(e => console.log('Audio play failed:', e));
+                
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                    window.location.href = "spot.html";
+                }, 3000);
+                
+                // Update UI to show success
+                submitButton.textContent = "🎉 CORRECT!";
+                submitButton.style.background = "linear-gradient(135deg, #06ffa5 0%, #3a86ff 100%)";
+                passwordInput.disabled = true;
+                
+            } else {
+                showError("THATS NOT IT!");
+                passwordInput.value = "";
+                passwordInput.focus();
+            }
+        }
+
+        // Event listeners
+        submitButton.addEventListener('click', handleSubmit);
+
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleSubmit();
+            }
+        });
+
+        // Auto-focus on input
+        passwordInput.focus();
+    </script>
+</body>
+</html>
