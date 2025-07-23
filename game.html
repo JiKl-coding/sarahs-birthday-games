@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarah's Birthday Games - Music Quiz</title>
+    <link rel="stylesheet" href="globals.css">
+    <style>
+        /* Additional styles for game page */
+        .game-container {
+            padding: 15px;
+            height: 100vh;
+            width: 100vw;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            box-sizing: border-box;
+            overflow-y: auto;
+            gap: 15px;
+        }
+
+        .quiz-section {
+            width: 100%;
+            max-width: 350px;
+            background: linear-gradient(135deg, #000 0%, #333 100%);
+            border-radius: 15px;
+            border: 3px solid #fff;
+            padding: 15px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .song-item {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: linear-gradient(135deg, #ff006e 20%, #8338ec 80%);
+            border-radius: 12px;
+            border: 2px solid #fff;
+        }
+
+        .song-number {
+            color: #fff;
+            font-weight: 900;
+            font-size: clamp(14px, 3.5vw, 16px);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            margin-bottom: 5px;
+        }
+
+        .audio-control {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(135deg, #ffbe0b 0%, #fb8500 100%);
+            border: none;
+            border-radius: 20px;
+            color: #000;
+            font-weight: 900;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+            box-shadow: 0 4px 0 #d4611a, 0 6px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+            touch-action: manipulation;
+        }
+
+        .audio-control:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #d4611a, 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .dropdown {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #06ffa5 0%, #3a86ff 100%);
+            border: 2px solid #fff;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 700;
+            font-size: clamp(12px, 3vw, 14px);
+            cursor: pointer;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+        }
+
+        .dropdown option {
+            background: #fff;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 900;
+            cursor: pointer;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            box-shadow: 
+                0 6px 0 #1a1a5e,
+                0 10px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            margin: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .submit-button:active {
+            transform: translateY(4px);
+            box-shadow: 
+                0 2px 0 #1a1a5e,
+                0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .result-message {
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 900;
+            color: #fff;
+            text-align: center;
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 3px solid #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s ease;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 100%;
+            max-width: 350px;
+            box-sizing: border-box;
+        }
+
+        .result-message.show {
+            opacity: 1;
+            transform: scale(1);
+            animation: errorShake 0.5s ease-in-out;
+        }
+
+        /* Mobile optimizations */
+        @media (max-height: 700px) {
+            .game-container {
+                gap: 10px;
+                padding: 10px;
+            }
+            
+            .quiz-section {
+                max-width: 320px;
+                padding: 12px;
+            }
+            
+            .song-item {
+                margin-bottom: 15px;
+                padding: 10px;
+            }
+            
+            .audio-control {
+                height: 35px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .game-container {
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            .quiz-section {
+                max-width: 300px;
+                padding: 10px;
+            }
+            
+            .song-item {
+                margin-bottom: 12px;
+                padding: 8px;
+            }
+            
+            .audio-control {
+                height: 32px;
+            }
+            
+            .submit-button {
+                padding: 12px 24px;
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background music disabled for quiz -->
+    
+    <div class="game-container">
+        <h1 class="main-title">MUSIC QUIZ</h1>
+        <h2 class="sub-title">MATCH SONG TO BAND</h2>
+        
+        <div class="quiz-section">
+            <div class="song-item">
+                <div class="song-number">SONG 1:</div>
+                <button class="audio-control" data-song="1">🎵 PLAY SONG 1</button>
+                <select class="dropdown" data-answer="1">
+                    <option value="">Choose band...</option>
+                </select>
+                <audio preload="auto">
+                    <source src="songs/1.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <div class="song-item">
+                <div class="song-number">SONG 2:</div>
+                <button class="audio-control" data-song="2">🎵 PLAY SONG 2</button>
+                <select class="dropdown" data-answer="2">
+                    <option value="">Choose band...</option>
+                </select>
+                <audio preload="auto">
+                    <source src="songs/2.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <div class="song-item">
+                <div class="song-number">SONG 3:</div>
+                <button class="audio-control" data-song="3">🎵 PLAY SONG 3</button>
+                <select class="dropdown" data-answer="3">
+                    <option value="">Choose band...</option>
+                </select>
+                <audio preload="auto">
+                    <source src="songs/3.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <div class="song-item">
+                <div class="song-number">SONG 4:</div>
+                <button class="audio-control" data-song="4">🎵 PLAY SONG 4</button>
+                <select class="dropdown" data-answer="4">
+                    <option value="">Choose band...</option>
+                </select>
+                <audio preload="auto">
+                    <source src="songs/4.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <div class="song-item">
+                <div class="song-number">SONG 5:</div>
+                <button class="audio-control" data-song="5">🎵 PLAY SONG 5</button>
+                <select class="dropdown" data-answer="5">
+                    <option value="">Choose band...</option>
+                </select>
+                <audio preload="auto">
+                    <source src="songs/5.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+
+            <div class="song-item">
+                <div class="song-number">SONG 6:</div>
+                <button class="audio-control" data-song="6">🎵 PLAY SONG 6</button>
+                <select class="dropdown" data-answer="6">
+                    <option value="">Choose band...</option>
+                </select>
+                <audio preload="auto">
+                    <source src="songs/6.mp3" type="audio/mpeg">
+                </audio>
+            </div>
+        </div>
+
+        <button class="submit-button" id="submit-quiz">🎯 SUBMIT ANSWERS</button>
+        
+        <div id="result-message" class="result-message"></div>
+    </div>
+
+    <script>
+        // Band names in correct order (1.mp3 = Limp Bizkit, etc.)
+        const correctAnswers = {
+            1: "Limp Bizkit",
+            2: "Rammstein",
+            3: "Slipknot", 
+            4: "Muse",
+            5: "Metallica",
+            6: "Voldemort"
+        };
+
+        const bandNames = ["Limp Bizkit", "Rammstein", "Slipknot", "Muse", "Metallica", "Voldemort"];
+        
+        let currentPlayingAudio = null;
+
+        // Shuffle array function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Populate dropdowns with shuffled band names
+        function populateDropdowns() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(dropdown => {
+                const shuffledBands = shuffleArray(bandNames);
+                shuffledBands.forEach(band => {
+                    const option = document.createElement('option');
+                    option.value = band;
+                    option.textContent = band;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        // Add vibration feedback
+        function addVibration() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+
+        // Stop currently playing audio
+        function stopCurrentAudio() {
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                // Reset button text
+                const button = document.querySelector(`[data-song="${currentPlayingAudio.dataset.song}"]`);
+                if (button) {
+                    button.textContent = `🎵 PLAY SONG ${currentPlayingAudio.dataset.song}`;
+                }
+                currentPlayingAudio = null;
+            }
+        }
+
+        // Setup audio controls
+        function setupAudioControls() {
+            const audioButtons = document.querySelectorAll('.audio-control');
+            
+            audioButtons.forEach(button => {
+                const songNumber = button.dataset.song;
+                const audioElement = button.parentElement.querySelector('audio');
+                audioElement.dataset.song = songNumber;
+                
+                button.addEventListener('click', () => {
+                    addVibration();
+                    
+                    // If this audio is currently playing, stop it
+                    if (currentPlayingAudio === audioElement) {
+                        stopCurrentAudio();
+                        return;
+                    }
+                    
+                    // Stop any currently playing audio
+                    stopCurrentAudio();
+                    
+                    // Start playing this audio
+                    currentPlayingAudio = audioElement;
+                    audioElement.play().catch(e => console.log('Audio play failed:', e));
+                    button.textContent = `⏹️ STOP SONG ${songNumber}`;
+                    
+                    // When audio ends, reset button
+                    audioElement.addEventListener('ended', () => {
+                        button.textContent = `🎵 PLAY SONG ${songNumber}`;
+                        currentPlayingAudio = null;
+                    }, { once: true });
+                });
+            });
+        }
+
+        // Check answers and handle submission
+        function checkAnswers() {
+            const dropdowns = document.querySelectorAll('.dropdown');
+            let allCorrect = true;
+            let allAnswered = true;
+
+            dropdowns.forEach(dropdown => {
+                const songNumber = dropdown.dataset.answer;
+                const selectedAnswer = dropdown.value;
+                
+                if (!selectedAnswer) {
+                    allAnswered = false;
+                }
+                
+                if (selectedAnswer !== correctAnswers[songNumber]) {
+                    allCorrect = false;
+                }
+            });
+
+            const resultMessage = document.getElementById('result-message');
+            
+            if (!allAnswered) {
+                resultMessage.textContent = "PLEASE ANSWER ALL QUESTIONS";
+                resultMessage.classList.add('show');
+                setTimeout(() => {
+                    resultMessage.classList.remove('show');
+                }, 3000);
+                return;
+            }
+
+            if (allCorrect) {
+                // Stop any playing audio before redirect
+                stopCurrentAudio();
+                window.location.href = "schiffer.html";
+            } else {
+                resultMessage.textContent = "INCORRECT, LISTEN ONCE AGAIN";
+                resultMessage.classList.add('show');
+                setTimeout(() => {
+                    resultMessage.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDropdowns();
+            setupAudioControls();
+            
+            const submitButton = document.getElementById('submit-quiz');
+            submitButton.addEventListener('click', () => {
+                addVibration();
+                checkAnswers();
+            });
+        });
+    </script>
+</body>
+</html>
