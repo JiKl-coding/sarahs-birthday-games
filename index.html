@@ -57,7 +57,7 @@
     </div>
 
     <script>
-        const correctCode = "2007";
+        const correctCode = "10115";
         let input = "";
 
         const display = document.getElementById('display');
@@ -71,7 +71,7 @@
 
         function updateDisplay() {
             display.innerHTML = '';
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 5; i++) {
                 const digit = document.createElement('span');
                 digit.className = 'digit-slot';
                 digit.textContent = input[i] || '';
@@ -124,13 +124,13 @@
                     input = input.slice(0, -1);
                 } else if (key.classList.contains('clear')) {
                     resetInput();
-                } else if (key.classList.contains('number') && input.length < 4) {
+                } else if (key.classList.contains('number') && input.length < 5) {
                     input += key.textContent;
                 }
                 
                 updateDisplay();
                 
-                if (input.length === 4) {
+                if (input.length === 5) {
                     setTimeout(() => {
                         if (input === correctCode) {
                             window.location.href = "/game";
